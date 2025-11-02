@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Web Clone Pro v2.0 — SHADOW JOKER</title>
 
-  <!-- Prism for syntax highlight -->
   <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
 
   <style>
@@ -17,6 +16,10 @@
       --panel: rgba(255,255,255,0.03);
       --glass: rgba(255,255,255,0.03);
       --muted: rgba(255,255,255,0.12);
+      /* New Logo Colors */
+      --logo-primary: #00ff9d;
+      --logo-secondary: #00b3ff;
+      --logo-tertiary: #ff4dff;
     }
     html,body{height:100%;margin:0;background:linear-gradient(180deg,#000,#00110a);color:var(--neon-1);font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
     *{box-sizing:border-box}
@@ -26,8 +29,16 @@
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(0,255,157,0.04);border-radius:14px;padding:18px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px);}
 
     header{display:flex;gap:14px;align-items:center}
+    /* --- UNIQUE LOGO DESIGN --- */
     .logo{width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-family:monospace;
-      background:linear-gradient(135deg,var(--neon-1), var(--neon-2));color:#001; box-shadow: 0 10px 40px rgba(0,255,157,0.08);}
+      background: radial-gradient(circle at 100% 0, var(--logo-tertiary), transparent 30%),
+                  conic-gradient(from 180deg at 0% 100%, var(--logo-secondary), transparent 30%),
+                  linear-gradient(135deg, var(--logo-primary), var(--logo-secondary));
+      color:#001;
+      box-shadow: 0 0 15px rgba(0,255,157,0.4), inset 0 0 8px rgba(0,255,157,0.8); /* Enhanced glow effect */
+      border: 2px solid var(--neon-1);
+    }
+    /* -------------------------- */
     h1{margin:0;font-size:20px;letter-spacing:0.8px}
     p.lead{margin:0;color:rgba(0,255,157,0.9);font-size:13px}
 
@@ -118,11 +129,9 @@
   </style>
 </head>
 <body>
-  <!-- side borders -->
   <div class="side-border-left" aria-hidden="true"></div>
   <div class="side-border-right" aria-hidden="true"></div>
 
-  <!-- subtle matrix background -->
   <canvas id="matrix" style="position:fixed;inset:0;z-index:1;opacity:0.14;"></canvas>
 
   <div class="wrap" style="z-index:6;position:relative;">
@@ -146,7 +155,6 @@
       </div>
 
       <div class="grid">
-        <!-- left panel: html output -->
         <div>
           <div class="panel">
             <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
@@ -171,7 +179,6 @@
           </div>
         </div>
 
-        <!-- right panel: assets -->
         <div>
           <div class="panel">
             <div style="display:flex;justify-content:space-between;align-items:center">
@@ -208,8 +215,7 @@
     </div>
   </div>
 
-  <!-- Verification popup (emoji challenge) -->
-  <div id="verifyPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="verifyPopup" class="popup show" role="dialog" aria-modal="true" aria-hidden="false">
     <div class="title c4">⚡ ACCESS VERIFICATION</div>
     <div class="desc">Tap the emojis in the correct order to verify human access</div>
     <div style="display:flex;gap:12px;justify-content:center;margin:12px 0">
@@ -223,7 +229,6 @@
     </div>
   </div>
 
-  <!-- Join popup shown after verification -->
   <div id="joinPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" style="min-width:420px">
     <div class="title c2">⚡ ACCESS GRANTED — Welcome</div>
     <div class="desc">You are verified. Join our communities for tools & updates.</div>
@@ -236,7 +241,6 @@
     </div>
   </div>
 
-  <!-- About popup -->
   <div id="aboutPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" style="min-width:420px">
     <div class="title c3">About Web Clone Pro</div>
     <div class="desc">Frontend-only advanced clone demo with public CORS proxy, syntax highlight, ZIP export and per-asset fetching. Use for learning and permitted tasks only.</div>
@@ -245,7 +249,6 @@
     </div>
   </div>
 
-  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -265,8 +268,9 @@
   document.getElementById('openFB').href = FB_LINK;
   document.getElementById('joinTGbtn').href = TG_LINK;
   document.getElementById('joinFBbtn').href = FB_LINK;
-  document.getElementById('openTG').addEventListener('click', ()=> showJoinPopup());
-  document.getElementById('openFB').addEventListener('click', ()=> showJoinPopup());
+  // NOTE: Clicking the 'Quick Links' will now show the join popup for better UX, regardless of access granted status.
+  document.getElementById('openTG').addEventListener('click', (e)=>{ e.preventDefault(); showJoinPopup(); });
+  document.getElementById('openFB').addEventListener('click', (e)=>{ e.preventDefault(); showJoinPopup(); });
 
   // elements
   const statusText = document.getElementById('statusText');
@@ -277,6 +281,7 @@
   let foundAssets = []; // {type, url, content?, contentType?}
   let verifySequence = ['1','2','3']; // expected data-val sequence
   let verifyProgress = 0;
+  let accessVerified = false; // New state to track verification
 
   /* ================= Matrix Canvas Background ================= */
   (function matrixInit(){
@@ -486,12 +491,21 @@
   const joinPopup = document.getElementById('joinPopup');
   const aboutPopup = document.getElementById('aboutPopup');
 
-  document.getElementById('btnVerify').addEventListener('click', ()=> {
+  // function to show verification popup
+  function showVerifyPopup(){
+    if(accessVerified) return; // Don't show if already verified
     verifyProgress = 0;
-    // randomize sequence to keep it dynamic (but ensure same values exist)
-    verifySequence = ['1','2','3']; // keep simple and consistent
+    // Keep simple and consistent
+    verifySequence = ['1','2','3'];
     verifyPopup.classList.add('show'); verifyPopup.setAttribute('aria-hidden','false');
-  });
+  }
+
+  // function to show join popup
+  function showJoinPopup(){
+    joinPopup.classList.add('show'); joinPopup.setAttribute('aria-hidden','false');
+  }
+
+  document.getElementById('btnVerify').addEventListener('click', showVerifyPopup);
   document.getElementById('btnCloseVerify').addEventListener('click', ()=> {
     verifyPopup.classList.remove('show'); verifyPopup.setAttribute('aria-hidden','true');
   });
@@ -517,6 +531,7 @@
   });
 
   function accessGranted(){
+    accessVerified = true;
     setStatus('Access Granted ✅');
     // visual effect: burst emojis
     for(let i=0;i<18;i++){
@@ -529,7 +544,7 @@
       setTimeout(()=>el.remove(),1800);
     }
     // show join popup after small delay
-    setTimeout(()=>{ joinPopup.classList.add('show'); joinPopup.setAttribute('aria-hidden','false'); }, 700);
+    setTimeout(showJoinPopup, 700);
   }
 
   document.getElementById('btnCloseJoin').addEventListener('click', ()=> {
@@ -543,13 +558,11 @@
     aboutPopup.classList.remove('show'); aboutPopup.setAttribute('aria-hidden','true');
   });
 
-  /* ================ Auto show verify popup on first load ================ */
+  /* ================ Auto show verify popup on first load is no longer needed as the popup is initially set to 'show' ================ */
   window.addEventListener('load', ()=>{
-    // small delay then show
-    setTimeout(()=> {
-      verifyPopup.classList.add('show'); verifyPopup.setAttribute('aria-hidden','false');
-    }, 600);
-    // set join buttons' href
+    // This is just to ensure any initialisation runs after everything is loaded.
+    // The popups are already visible/ready due to HTML/CSS changes.
+    // set join buttons' href (already done above, but safe to re-run)
     document.getElementById('joinTGbtn').href = TG_LINK;
     document.getElementById('joinFBbtn').href = FB_LINK;
     document.getElementById('openTG').href = TG_LINK;
