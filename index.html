@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Clone Pro v2.0 — SHADOW JOKER</title>
+
+  <!-- Prism for syntax highlight -->
+  <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.css" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#000;
+      --neon-1:#00ff9d;
+      --neon-2:#00b3ff;
+      --neon-3:#ff4dff;
+      --panel: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.03);
+      --muted: rgba(255,255,255,0.12);
+    }
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,#000,#00110a);color:var(--neon-1);font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+    *{box-sizing:border-box}
+
+    /* layout container */
+    .wrap{max-width:1200px;margin:28px auto;padding:18px;position:relative;z-index:5;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(0,255,157,0.04);border-radius:14px;padding:18px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px);}
+
+    header{display:flex;gap:14px;align-items:center}
+    .logo{width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-family:monospace;
+      background:linear-gradient(135deg,var(--neon-1), var(--neon-2));color:#001; box-shadow: 0 10px 40px rgba(0,255,157,0.08);}
+    h1{margin:0;font-size:20px;letter-spacing:0.8px}
+    p.lead{margin:0;color:rgba(0,255,157,0.9);font-size:13px}
+
+    /* controls */
+    .controls{display:flex;gap:12px;margin-top:14px;align-items:center}
+    .controls input[type="text"]{
+      flex:1;padding:12px 14px;border-radius:10px;background:#041210;border:1px solid rgba(0,255,157,0.06);color:var(--neon-1);outline:none;font-family:monospace;
+      box-shadow: inset 0 2px 12px rgba(0,0,0,0.6);
+    }
+    .btn{padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-weight:800;background:linear-gradient(180deg,var(--neon-1), #67ffb2);color:#001;box-shadow:0 10px 30px rgba(0,0,0,0.6);transition:transform .12s ease}
+    .btn:hover{transform:translateY(-3px)}
+    .btn.ghost{background:transparent;border:1px dashed rgba(0,255,157,0.06);color:var(--neon-1)}
+
+    /* grid */
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px;margin-top:18px}
+    .panel{background:linear-gradient(180deg, rgba(5,12,11,0.6), rgba(0,0,0,0.65));border-radius:10px;padding:12px;border:1px solid rgba(0,255,157,0.04);height:640px;overflow:auto}
+    .panel h3{margin:0 0 8px 0;color:var(--neon-2)}
+    .panel pre{margin:0;padding:12px;background:transparent;border-radius:8px;white-space:pre-wrap;word-break:break-word;color:#d7ffd9}
+
+    /* side borders (glowing gradient) */
+    .side-border-left, .side-border-right{
+      position:fixed;top:0;bottom:0;width:10px;z-index:3;pointer-events:none;border-radius:0;
+      background:linear-gradient(180deg, rgba(0,255,157,0.18), rgba(0,179,255,0.12), rgba(255,77,255,0.10));
+      filter: blur(8px);transform:translateZ(0);
+      animation: borderShift 6s linear infinite;
+      opacity:0.85;
+    }
+    .side-border-left{left:0}
+    .side-border-right{right:0}
+    @keyframes borderShift{
+      0%{background-position:0% 0%}
+      50%{background-position:100% 100%}
+      100%{background-position:0% 0%}
+    }
+
+    /* avatar */
+    .avatar{width:120px;height:120px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(0,255,157,0.06), rgba(0,179,255,0.04));box-shadow:0 10px 30px rgba(0,255,157,0.06);font-weight:900;color:#001;font-family:monospace}
+
+    /* status */
+    .status{display:flex;align-items:center;gap:10px;font-family:monospace}
+    .status-dot{width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,var(--neon-1),var(--neon-2));box-shadow:0 6px 18px rgba(0,255,157,0.12)}
+
+    /* asset list */
+    #assetList{padding-left:12px;margin-top:8px;line-height:1.7;color:var(--neon-1);font-family:monospace}
+    #assetList li{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:6px;border-radius:6px}
+    .asset-btn{padding:6px 8px;border-radius:8px;background:transparent;border:1px solid rgba(0,255,157,0.04);color:var(--neon-1);cursor:pointer}
+
+    /* colored text classes */
+    .c1{color:var(--neon-1); text-shadow:0 0 8px rgba(0,255,157,0.15)}
+    .c2{color:var(--neon-2); text-shadow:0 0 10px rgba(0,179,255,0.12)}
+    .c3{color:var(--neon-3); text-shadow:0 0 12px rgba(255,77,255,0.12)}
+    .c4{color:#ffd166; text-shadow:0 0 8px rgba(255,209,102,0.12)}
+    .c5{color:#ff6b6b; text-shadow:0 0 8px rgba(255,107,107,0.12)}
+
+    /* rainbow credit animation */
+    .credit{
+      font-weight:900;font-family:monospace;margin-top:14px;
+      background:linear-gradient(90deg,#ff0080,#ff8c00,#ffd300,#00e0a8,#00b3ff,#8e44ff);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      animation: rainbow 4s linear infinite;
+      font-size:13px;
+    }
+    @keyframes rainbow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+    /* popup */
+    .popup {
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(0.92);
+      min-width:360px;max-width:92%;background:linear-gradient(180deg,#001616,#001a2a);
+      border:1px solid rgba(0,255,157,0.08);padding:18px;border-radius:14px;z-index:9999;
+      box-shadow:0 20px 80px rgba(0,0,0,0.75);display:none;
+    }
+    .popup.show{display:block;animation:pop .16s ease-out forwards}
+    @keyframes pop{from{opacity:0;transform:translate(-50%,-50%) scale(0.9)} to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+    .popup .title{font-weight:900;color:#fff;margin-bottom:6px}
+    .popup .desc{color:rgba(255,255,255,0.8);font-size:14px;margin-bottom:12px}
+    .popup .actions{display:flex;gap:8px;justify-content:center}
+
+    /* tiny helpers */
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:13px;color:rgba(255,255,255,0.6)}
+    .linkbtn{display:inline-block;padding:8px 12px;border-radius:10px;text-decoration:none;background:linear-gradient(180deg,var(--neon-2),#67d4ff);color:#001;font-weight:800}
+
+    /* responsive */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr}
+      .panel{height:380px}
+    }
+  </style>
+</head>
+<body>
+  <!-- side borders -->
+  <div class="side-border-left" aria-hidden="true"></div>
+  <div class="side-border-right" aria-hidden="true"></div>
+
+  <!-- subtle matrix background -->
+  <canvas id="matrix" style="position:fixed;inset:0;z-index:1;opacity:0.14;"></canvas>
+
+  <div class="wrap" style="z-index:6;position:relative;">
+    <div class="card" role="main">
+      <header>
+        <div class="logo">SJ</div>
+        <div style="flex:1;">
+          <h1>Web Clone Pro <span class="small c2">v2.0</span></h1>
+          <p class="lead">Advanced front-end website cloner — Use responsibly. Educational / permission-only usage.</p>
+        </div>
+        <div style="text-align:right">
+          <div class="credit">© SHADOW JOKER</div>
+          <div class="small muted">Final Pro Edition — Hacker Interface</div>
+        </div>
+      </header>
+
+      <div class="controls" style="margin-top:18px">
+        <input id="siteUrl" type="text" placeholder="Enter full site URL (e.g. https://example.com)" />
+        <button class="btn" id="btnClone">⚡ CLONE</button>
+        <button class="btn ghost" id="btnClear">Clear</button>
+      </div>
+
+      <div class="grid">
+        <!-- left panel: html output -->
+        <div>
+          <div class="panel">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+              <div class="avatar">HAX</div>
+              <div style="flex:1">
+                <div class="small">Status</div>
+                <div class="status" style="margin-top:6px">
+                  <div class="status-dot"></div>
+                  <div id="statusText" class="muted">Idle — Enter a URL and press CLONE</div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="c3">HTML Preview</h3>
+            <pre id="htmlOut" class="language-markup"><code class="language-markup">No HTML fetched yet.</code></pre>
+
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <button class="btn ghost" id="btnVerify">🔓 Verify Access</button>
+              <button class="btn ghost" id="btnCopyHtml">Copy HTML</button>
+              <button class="btn" id="btnDownloadZip">Download ZIP</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- right panel: assets -->
+        <div>
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="small">Assets & Tools</div>
+                <div class="muted" style="font-size:12px">External CSS / JS / Images found in the fetched HTML</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn ghost" id="btnFetchAll">Fetch All</button>
+                <button class="btn ghost" id="btnClearAssets">Clear Assets</button>
+              </div>
+            </div>
+
+            <hr style="border:none;height:1px;background:rgba(0,255,157,0.03);margin:10px 0" />
+
+            <h3 class="c2">Asset List</h3>
+            <ul id="assetList"></ul>
+
+            <hr style="border:none;height:1px;background:rgba(0,255,157,0.03);margin:10px 0" />
+            <div class="small">Quick Links</div>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <a class="linkbtn" id="openTG" href="#" target="_blank" rel="noopener">Join Telegram</a>
+              <a class="linkbtn" id="openFB" href="#" target="_blank" rel="noopener" style="background:linear-gradient(180deg,var(--neon-3), #ff7fff);color:#001">Join Facebook</a>
+              <button class="btn ghost" id="btnAbout">About</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer style="margin-top:14px;text-align:center">
+        <div class="credit">© SHADOW JOKER</div>
+        <div class="small muted">Built for education • Respect copyright & terms</div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Verification popup (emoji challenge) -->
+  <div id="verifyPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="title c4">⚡ ACCESS VERIFICATION</div>
+    <div class="desc">Tap the emojis in the correct order to verify human access</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin:12px 0">
+      <button class="emoji" data-val="1" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">🔒</button>
+      <button class="emoji" data-val="2" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">✅</button>
+      <button class="emoji" data-val="3" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">🚀</button>
+      <button class="emoji" data-val="4" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">💀</button>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="btnCloseVerify">Close</button>
+    </div>
+  </div>
+
+  <!-- Join popup shown after verification -->
+  <div id="joinPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" style="min-width:420px">
+    <div class="title c2">⚡ ACCESS GRANTED — Welcome</div>
+    <div class="desc">You are verified. Join our communities for tools & updates.</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:12px">
+      <a id="joinTGbtn" class="linkbtn" href="#" target="_blank" rel="noopener">Join Telegram</a>
+      <a id="joinFBbtn" class="linkbtn" href="#" target="_blank" rel="noopener" style="background:linear-gradient(180deg,var(--neon-3), #ff7fff)">Join Facebook</a>
+    </div>
+    <div style="text-align:center;margin-top:12px">
+      <button class="btn ghost" id="btnCloseJoin">Close</button>
+    </div>
+  </div>
+
+  <!-- About popup -->
+  <div id="aboutPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" style="min-width:420px">
+    <div class="title c3">About Web Clone Pro</div>
+    <div class="desc">Frontend-only advanced clone demo with public CORS proxy, syntax highlight, ZIP export and per-asset fetching. Use for learning and permitted tasks only.</div>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn ghost" id="btnCloseAbout">Close</button>
+    </div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+  <script>
+  /****************************************************************
+   * Config Constants (edit if needed)
+   ****************************************************************/
+  const PROXY = "https://api.allorigins.win/raw?url="; // CORS proxy
+  const TG_LINK = "https://t.me/+DLEo8TQ1PjIzYzFl";       // user's Telegram group (provided)
+  const FB_LINK = "https://facebook.com/groups/1323301919238170/"; // user's Facebook group
+  /****************************************************************/
+
+  // wire up join buttons
+  document.getElementById('openTG').href = TG_LINK;
+  document.getElementById('openFB').href = FB_LINK;
+  document.getElementById('joinTGbtn').href = TG_LINK;
+  document.getElementById('joinFBbtn').href = FB_LINK;
+  document.getElementById('openTG').addEventListener('click', ()=> showJoinPopup());
+  document.getElementById('openFB').addEventListener('click', ()=> showJoinPopup());
+
+  // elements
+  const statusText = document.getElementById('statusText');
+  const htmlOut = document.getElementById('htmlOut').querySelector('code');
+  const assetListEl = document.getElementById('assetList');
+
+  let currentHtml = "";
+  let foundAssets = []; // {type, url, content?, contentType?}
+  let verifySequence = ['1','2','3']; // expected data-val sequence
+  let verifyProgress = 0;
+
+  /* ================= Matrix Canvas Background ================= */
+  (function matrixInit(){
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const cols = Math.floor(innerWidth / 14);
+    const drops = Array(cols).fill(1);
+    const letters = "01";
+    function draw(){
+      ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle = "rgba(0,255,157,0.06)";
+      ctx.font = "12px monospace";
+      for(let i=0;i<drops.length;i++){
+        const text = letters.charAt(Math.floor(Math.random()*letters.length));
+        ctx.fillText(text, i*14, drops[i]*14);
+        drops[i]++;
+        if(drops[i]*14>canvas.height && Math.random()>0.975) drops[i]=0;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* ================= Helpers ================= */
+  function setStatus(t){ statusText.textContent = t; }
+  function filenameFromUrl(u){
+    try{
+      const p = new URL(u).pathname.split('/').filter(Boolean).pop() || new URL(u).hostname;
+      return p.replace(/[^\w\.\-]/g,'_');
+    }catch(e){ return 'asset'; }
+  }
+  function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  /* ================ Proxy fetch util ================ */
+  async function fetchViaProxy(url){
+    setStatus('Proxy fetching: ' + url);
+    const res = await fetch(PROXY + encodeURIComponent(url));
+    if(!res.ok) throw new Error('Proxy fetch failed: ' + res.status);
+    const ctype = res.headers.get('Content-Type') || '';
+    const text = await res.text();
+    return {text, contentType: ctype};
+  }
+
+  /* ================ Parse assets ================ */
+  function parseAssetsFromHtml(html, baseUrl){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const assets = [];
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach(el=>{
+      const href = el.getAttribute('href');
+      if(href) assets.push({type:'css', url: (new URL(href, baseUrl)).href});
+    });
+    doc.querySelectorAll('script[src]').forEach(el=>{
+      const src = el.getAttribute('src');
+      if(src) assets.push({type:'js', url: (new URL(src, baseUrl)).href});
+    });
+    doc.querySelectorAll('img[src]').forEach(el=>{
+      const src = el.getAttribute('src');
+      if(src) assets.push({type:'img', url: (new URL(src, baseUrl)).href});
+    });
+    doc.querySelectorAll('source').forEach(el=>{
+      const s = el.getAttribute('src') || (el.getAttribute('srcset') || '').split(',')[0];
+      if(s) assets.push({type:'media', url: (new URL(s, baseUrl)).href});
+    });
+    // dedupe
+    const uniq = []; const seen = new Set();
+    for(const a of assets){
+      if(!seen.has(a.url)){ seen.add(a.url); uniq.push(a); }
+    }
+    return uniq;
+  }
+
+  /* ================ UI: render asset list ================ */
+  function renderAssetList(){
+    assetListEl.innerHTML = '';
+    if(foundAssets.length===0){
+      assetListEl.innerHTML = '<li class="muted" style="padding:8px;color:rgba(255,255,255,0.15)">No external assets found.</li>';
+      return;
+    }
+    foundAssets.forEach((a, idx)=>{
+      const li = document.createElement('li');
+      const left = document.createElement('div'); left.style.maxWidth='64%'; left.style.overflow='hidden'; left.style.textOverflow='ellipsis'; left.style.whiteSpace='nowrap';
+      left.textContent = `[${a.type.toUpperCase()}] ${a.url}`;
+      const right = document.createElement('div'); right.style.display='flex'; right.style.gap='8px';
+      const btnFetch = document.createElement('button'); btnFetch.textContent='Fetch'; btnFetch.className='asset-btn';
+      const btnView = document.createElement('button'); btnView.textContent='View'; btnView.className='asset-btn';
+      const btnSave = document.createElement('button'); btnSave.textContent='Save'; btnSave.className='asset-btn';
+      right.appendChild(btnFetch); right.appendChild(btnView); right.appendChild(btnSave);
+      li.appendChild(left); li.appendChild(right);
+      assetListEl.appendChild(li);
+
+      btnFetch.onclick = async ()=>{
+        btnFetch.textContent = '...';
+        try{
+          const res = await fetchViaProxy(a.url);
+          a.content = res.text; a.contentType = res.contentType;
+          btnFetch.textContent = 'OK';
+          setTimeout(()=>btnFetch.textContent='Fetched', 600);
+        }catch(err){
+          console.error(err); btnFetch.textContent = 'Err'; setTimeout(()=>btnFetch.textContent='Fetch', 900);
+        }
+      };
+
+      btnView.onclick = ()=>{
+        if(!a.content){ alert('Fetch asset first'); return; }
+        const w = window.open('','_blank');
+        const mime = a.contentType || 'text/plain';
+        if(mime.includes('text') || a.url.endsWith('.js')||a.url.endsWith('.css')||a.url.endsWith('.svg')){
+          const html = `<!doctype html><html><head><meta charset="utf-8"><title>${a.url}</title></head><body style="background:#0b0f0f;color:#dfffe0;font-family:monospace;padding:12px;"><pre>${escapeHtml(a.content)}</pre></body></html>`;
+          w.document.write(html); w.document.close();
+        } else {
+          const blob = new Blob([a.content], {type:mime});
+          const url = URL.createObjectURL(blob);
+          w.location = url;
+        }
+      };
+
+      btnSave.onclick = ()=>{
+        if(!a.content){ alert('Fetch asset first'); return; }
+        const blob = new Blob([a.content], {type:a.contentType || 'text/plain'});
+        saveAs(blob, filenameFromUrl(a.url));
+      };
+    });
+  }
+
+  /* ================ Clone button flow ================ */
+  document.getElementById('btnClone').addEventListener('click', async ()=>{
+    const url = document.getElementById('siteUrl').value.trim();
+    if(!url){ alert('Enter URL first'); return; }
+    try{
+      setStatus('Fetching HTML via proxy...');
+      htmlOut.textContent = 'Loading...';
+      const {text} = await fetchViaProxy(url);
+      currentHtml = text;
+      htmlOut.textContent = text;
+      Prism.highlightElement(htmlOut);
+      setStatus('HTML fetched. Parsing external assets...');
+      foundAssets = parseAssetsFromHtml(text, url);
+      renderAssetList();
+      setStatus(`Found ${foundAssets.length} external assets.`);
+    }catch(err){
+      console.error(err);
+      htmlOut.textContent = '❌ Error fetching: ' + (err.message || err);
+      Prism.highlightElement(htmlOut);
+      setStatus('Fetch error');
+    }
+  });
+
+  /* ================ Fetch All assets ================ */
+  document.getElementById('btnFetchAll').addEventListener('click', async ()=>{
+    if(foundAssets.length===0){ alert('No assets to fetch'); return; }
+    setStatus('Fetching all assets via proxy...');
+    for(const a of foundAssets){
+      try{
+        const res = await fetchViaProxy(a.url);
+        a.content = res.text; a.contentType = res.contentType;
+      }catch(e){ console.warn('asset fetch error', a.url); }
+    }
+    renderAssetList();
+    setStatus('All assets fetch attempted.');
+  });
+
+  /* ================ Download ZIP assembly ================ */
+  document.getElementById('btnDownloadZip').addEventListener('click', async ()=>{
+    if(!currentHtml){ alert('Fetch HTML first'); return; }
+    setStatus('Preparing ZIP...');
+    const zip = new JSZip();
+    zip.file('index.html', currentHtml);
+    let added = 0;
+    for(const a of foundAssets){
+      if(a.content){
+        let filename = filenameFromUrl(a.url);
+        try{
+          const host = (new URL(a.url)).hostname.replace(/\./g,'_');
+          filename = `${host}/${filename}`;
+        }catch(e){}
+        zip.file(filename, a.content);
+        added++;
+      }
+    }
+    setStatus(`Adding ${added} assets to ZIP...`);
+    const blob = await zip.generateAsync({type:"blob"});
+    saveAs(blob, 'cloned_site.zip');
+    setStatus('ZIP downloaded.');
+  });
+
+  /* ================ Copy / Clear UI ================ */
+  document.getElementById('btnCopyHtml').addEventListener('click', async ()=>{
+    if(!currentHtml){ alert('No HTML to copy'); return; }
+    try{
+      await navigator.clipboard.writeText(currentHtml);
+      alert('HTML copied to clipboard');
+    }catch(e){ alert('Clipboard failed — try manual copy.'); }
+  });
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    document.getElementById('siteUrl').value='';
+    currentHtml=''; htmlOut.textContent='No HTML fetched yet.'; Prism.highlightElement(htmlOut);
+    foundAssets=[]; renderAssetList(); setStatus('Idle — Enter URL and press CLONE');
+  });
+  document.getElementById('btnClearAssets').addEventListener('click', ()=>{ foundAssets=[]; renderAssetList(); setStatus('Assets cleared'); });
+
+  /* ================ Verification popup logic ================ */
+  const verifyPopup = document.getElementById('verifyPopup');
+  const joinPopup = document.getElementById('joinPopup');
+  const aboutPopup = document.getElementById('aboutPopup');
+
+  document.getElementById('btnVerify').addEventListener('click', ()=> {
+    verifyProgress = 0;
+    // randomize sequence to keep it dynamic (but ensure same values exist)
+    verifySequence = ['1','2','3']; // keep simple and consistent
+    verifyPopup.classList.add('show'); verifyPopup.setAttribute('aria-hidden','false');
+  });
+  document.getElementById('btnCloseVerify').addEventListener('click', ()=> {
+    verifyPopup.classList.remove('show'); verifyPopup.setAttribute('aria-hidden','true');
+  });
+
+  document.querySelectorAll('#verifyPopup .emoji').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const v = e.currentTarget.getAttribute('data-val');
+      const need = verifySequence[verifyProgress];
+      if(v === need){
+        verifyProgress++;
+        e.currentTarget.animate([{transform:'scale(0.9)'},{transform:'scale(1)'}],{duration:140});
+        if(verifyProgress >= verifySequence.length){
+          // success
+          verifyPopup.classList.remove('show'); verifyPopup.setAttribute('aria-hidden','true');
+          accessGranted();
+        }
+      } else {
+        // reset
+        verifyProgress = 0;
+        e.currentTarget.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:260});
+      }
+    });
+  });
+
+  function accessGranted(){
+    setStatus('Access Granted ✅');
+    // visual effect: burst emojis
+    for(let i=0;i<18;i++){
+      const el = document.createElement('div');
+      el.textContent = ['✅','🚀','💀','🔒','✨'][Math.floor(Math.random()*5)];
+      el.style.position='fixed'; el.style.left=(40+Math.random()*20)+'%'; el.style.top=(40+Math.random()*20)+'%';
+      el.style.fontSize = (12+Math.random()*24)+'px'; el.style.zIndex=9999; el.style.opacity='0.95';
+      document.body.appendChild(el);
+      el.animate([{transform:'translateY(0) scale(1)', opacity:1},{transform:'translateY(-140px) scale(1.6)', opacity:0}],{duration:900+Math.random()*600, easing:'ease-out'});
+      setTimeout(()=>el.remove(),1800);
+    }
+    // show join popup after small delay
+    setTimeout(()=>{ joinPopup.classList.add('show'); joinPopup.setAttribute('aria-hidden','false'); }, 700);
+  }
+
+  document.getElementById('btnCloseJoin').addEventListener('click', ()=> {
+    joinPopup.classList.remove('show'); joinPopup.setAttribute('aria-hidden','true');
+  });
+
+  document.getElementById('btnAbout').addEventListener('click', ()=> {
+    aboutPopup.classList.add('show'); aboutPopup.setAttribute('aria-hidden','false');
+  });
+  document.getElementById('btnCloseAbout').addEventListener('click', ()=> {
+    aboutPopup.classList.remove('show'); aboutPopup.setAttribute('aria-hidden','true');
+  });
+
+  /* ================ Auto show verify popup on first load ================ */
+  window.addEventListener('load', ()=>{
+    // small delay then show
+    setTimeout(()=> {
+      verifyPopup.classList.add('show'); verifyPopup.setAttribute('aria-hidden','false');
+    }, 600);
+    // set join buttons' href
+    document.getElementById('joinTGbtn').href = TG_LINK;
+    document.getElementById('joinFBbtn').href = FB_LINK;
+    document.getElementById('openTG').href = TG_LINK;
+    document.getElementById('openFB').href = FB_LINK;
+  });
+
+  /* ================ Small UX: keyboard Enter triggers Clone ================ */
+  document.getElementById('siteUrl').addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ document.getElementById('btnClone').click(); } });
+
+  /* ================ Prism highlight initial state ================ */
+  Prism.highlightElement(htmlOut);
+
+  </script>
+</body>
+</html>
