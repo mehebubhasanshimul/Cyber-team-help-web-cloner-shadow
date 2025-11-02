@@ -16,10 +16,6 @@
       --panel: rgba(255,255,255,0.03);
       --glass: rgba(255,255,255,0.03);
       --muted: rgba(255,255,255,0.12);
-      /* New Logo Colors */
-      --logo-primary: #00ff9d;
-      --logo-secondary: #00b3ff;
-      --logo-tertiary: #ff4dff;
     }
     html,body{height:100%;margin:0;background:linear-gradient(180deg,#000,#00110a);color:var(--neon-1);font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
     *{box-sizing:border-box}
@@ -29,14 +25,18 @@
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(0,255,157,0.04);border-radius:14px;padding:18px;box-shadow: 0 12px 40px rgba(0,0,0,0.6);backdrop-filter: blur(6px);}
 
     header{display:flex;gap:14px;align-items:center}
-    /* --- UNIQUE LOGO DESIGN --- */
-    .logo{width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-family:monospace;
-      background: radial-gradient(circle at 100% 0, var(--logo-tertiary), transparent 30%),
-                  conic-gradient(from 180deg at 0% 100%, var(--logo-secondary), transparent 30%),
-                  linear-gradient(135deg, var(--logo-primary), var(--logo-secondary));
-      color:#001;
-      box-shadow: 0 0 15px rgba(0,255,157,0.4), inset 0 0 8px rgba(0,255,157,0.8); /* Enhanced glow effect */
+    /* --- LOGO IMAGE STYLING --- */
+    .logo{
+      width:72px;height:72px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;font-family:monospace;
+      background-image: url('https://iili.io/KLxWrlf.md.jpg');
+      background-size: cover;
+      background-position: center;
+      color:transparent; /* Hide 'SJ' text if image is used */
+      box-shadow: 0 0 15px rgba(0,255,157,0.6); /* Unique glow */
       border: 2px solid var(--neon-1);
+      overflow: hidden; /* Ensure image stays within borders */
     }
     /* -------------------------- */
     h1{margin:0;font-size:20px;letter-spacing:0.8px}
@@ -137,8 +137,7 @@
   <div class="wrap" style="z-index:6;position:relative;">
     <div class="card" role="main">
       <header>
-        <div class="logo">SJ</div>
-        <div style="flex:1;">
+        <div class="logo"></div> <div style="flex:1;">
           <h1>Web Clone Pro <span class="small c2">v2.0</span></h1>
           <p class="lead">Advanced front-end website cloner — Use responsibly. Educational / permission-only usage.</p>
         </div>
@@ -172,7 +171,7 @@
             <pre id="htmlOut" class="language-markup"><code class="language-markup">No HTML fetched yet.</code></pre>
 
             <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <button class="btn ghost" id="btnVerify">🔓 Verify Access</button>
+              <button class="btn ghost" id="btnVerify">🔓 Show Join Link</button>
               <button class="btn ghost" id="btnCopyHtml">Copy HTML</button>
               <button class="btn" id="btnDownloadZip">Download ZIP</button>
             </div>
@@ -215,29 +214,15 @@
     </div>
   </div>
 
-  <div id="verifyPopup" class="popup show" role="dialog" aria-modal="true" aria-hidden="false">
-    <div class="title c4">⚡ ACCESS VERIFICATION</div>
-    <div class="desc">Tap the emojis in the correct order to verify human access</div>
-    <div style="display:flex;gap:12px;justify-content:center;margin:12px 0">
-      <button class="emoji" data-val="1" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">🔒</button>
-      <button class="emoji" data-val="2" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">✅</button>
-      <button class="emoji" data-val="3" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">🚀</button>
-      <button class="emoji" data-val="4" style="font-size:28px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#001,#002);border:1px solid rgba(255,255,255,0.03)">💀</button>
-    </div>
-    <div class="actions">
-      <button class="btn ghost" id="btnCloseVerify">Close</button>
-    </div>
-  </div>
-
   <div id="joinPopup" class="popup" role="dialog" aria-modal="true" aria-hidden="true" style="min-width:420px">
-    <div class="title c2">⚡ ACCESS GRANTED — Welcome</div>
-    <div class="desc">You are verified. Join our communities for tools & updates.</div>
+    <div class="title c2">⚡ IMPORTANT NOTICE — Join Our Community</div>
+    <div class="desc">Please join our Telegram and Facebook groups for the latest tools and updates!</div>
     <div style="display:flex;gap:12px;justify-content:center;margin-top:12px">
       <a id="joinTGbtn" class="linkbtn" href="#" target="_blank" rel="noopener">Join Telegram</a>
       <a id="joinFBbtn" class="linkbtn" href="#" target="_blank" rel="noopener" style="background:linear-gradient(180deg,var(--neon-3), #ff7fff)">Join Facebook</a>
     </div>
     <div style="text-align:center;margin-top:12px">
-      <button class="btn ghost" id="btnCloseJoin">Close</button>
+      <button class="btn ghost" id="btnCloseJoin">Continue to Tool</button>
     </div>
   </div>
 
@@ -268,9 +253,9 @@
   document.getElementById('openFB').href = FB_LINK;
   document.getElementById('joinTGbtn').href = TG_LINK;
   document.getElementById('joinFBbtn').href = FB_LINK;
-  // NOTE: Clicking the 'Quick Links' will now show the join popup for better UX, regardless of access granted status.
   document.getElementById('openTG').addEventListener('click', (e)=>{ e.preventDefault(); showJoinPopup(); });
   document.getElementById('openFB').addEventListener('click', (e)=>{ e.preventDefault(); showJoinPopup(); });
+  document.getElementById('btnVerify').addEventListener('click', (e)=>{ showJoinPopup(); }); // Re-purposed the verify button
 
   // elements
   const statusText = document.getElementById('statusText');
@@ -279,9 +264,6 @@
 
   let currentHtml = "";
   let foundAssets = []; // {type, url, content?, contentType?}
-  let verifySequence = ['1','2','3']; // expected data-val sequence
-  let verifyProgress = 0;
-  let accessVerified = false; // New state to track verification
 
   /* ================= Matrix Canvas Background ================= */
   (function matrixInit(){
@@ -486,65 +468,12 @@
   });
   document.getElementById('btnClearAssets').addEventListener('click', ()=>{ foundAssets=[]; renderAssetList(); setStatus('Assets cleared'); });
 
-  /* ================ Verification popup logic ================ */
-  const verifyPopup = document.getElementById('verifyPopup');
+  /* ================ Popup Logic ================ */
   const joinPopup = document.getElementById('joinPopup');
   const aboutPopup = document.getElementById('aboutPopup');
 
-  // function to show verification popup
-  function showVerifyPopup(){
-    if(accessVerified) return; // Don't show if already verified
-    verifyProgress = 0;
-    // Keep simple and consistent
-    verifySequence = ['1','2','3'];
-    verifyPopup.classList.add('show'); verifyPopup.setAttribute('aria-hidden','false');
-  }
-
-  // function to show join popup
   function showJoinPopup(){
     joinPopup.classList.add('show'); joinPopup.setAttribute('aria-hidden','false');
-  }
-
-  document.getElementById('btnVerify').addEventListener('click', showVerifyPopup);
-  document.getElementById('btnCloseVerify').addEventListener('click', ()=> {
-    verifyPopup.classList.remove('show'); verifyPopup.setAttribute('aria-hidden','true');
-  });
-
-  document.querySelectorAll('#verifyPopup .emoji').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const v = e.currentTarget.getAttribute('data-val');
-      const need = verifySequence[verifyProgress];
-      if(v === need){
-        verifyProgress++;
-        e.currentTarget.animate([{transform:'scale(0.9)'},{transform:'scale(1)'}],{duration:140});
-        if(verifyProgress >= verifySequence.length){
-          // success
-          verifyPopup.classList.remove('show'); verifyPopup.setAttribute('aria-hidden','true');
-          accessGranted();
-        }
-      } else {
-        // reset
-        verifyProgress = 0;
-        e.currentTarget.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:260});
-      }
-    });
-  });
-
-  function accessGranted(){
-    accessVerified = true;
-    setStatus('Access Granted ✅');
-    // visual effect: burst emojis
-    for(let i=0;i<18;i++){
-      const el = document.createElement('div');
-      el.textContent = ['✅','🚀','💀','🔒','✨'][Math.floor(Math.random()*5)];
-      el.style.position='fixed'; el.style.left=(40+Math.random()*20)+'%'; el.style.top=(40+Math.random()*20)+'%';
-      el.style.fontSize = (12+Math.random()*24)+'px'; el.style.zIndex=9999; el.style.opacity='0.95';
-      document.body.appendChild(el);
-      el.animate([{transform:'translateY(0) scale(1)', opacity:1},{transform:'translateY(-140px) scale(1.6)', opacity:0}],{duration:900+Math.random()*600, easing:'ease-out'});
-      setTimeout(()=>el.remove(),1800);
-    }
-    // show join popup after small delay
-    setTimeout(showJoinPopup, 700);
   }
 
   document.getElementById('btnCloseJoin').addEventListener('click', ()=> {
@@ -558,15 +487,12 @@
     aboutPopup.classList.remove('show'); aboutPopup.setAttribute('aria-hidden','true');
   });
 
-  /* ================ Auto show verify popup on first load is no longer needed as the popup is initially set to 'show' ================ */
+  /* ================ Auto show Join popup on first load ================ */
   window.addEventListener('load', ()=>{
-    // This is just to ensure any initialisation runs after everything is loaded.
-    // The popups are already visible/ready due to HTML/CSS changes.
-    // set join buttons' href (already done above, but safe to re-run)
-    document.getElementById('joinTGbtn').href = TG_LINK;
-    document.getElementById('joinFBbtn').href = FB_LINK;
-    document.getElementById('openTG').href = TG_LINK;
-    document.getElementById('openFB').href = FB_LINK;
+    // Show the join popup automatically after a small delay
+    setTimeout(()=> {
+      showJoinPopup();
+    }, 600);
   });
 
   /* ================ Small UX: keyboard Enter triggers Clone ================ */
